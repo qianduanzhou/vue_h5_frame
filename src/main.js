@@ -20,16 +20,9 @@ Vue.prototype.sendkv = sendkv;
  * 错误上报
  */
 Vue.config.errorHandler = function (err, vm, info) {
-  console.log('err', errList)
+  console.log('err', err)
   console.log('vm', vm)
   console.log('info', info)
-  let errList = err.toString().split(':')
-  sendkv({
-    key: 900108,
-    type: errList[0],
-    describe: errList[1],
-    location: info
-  })
 }
 
 //  调试

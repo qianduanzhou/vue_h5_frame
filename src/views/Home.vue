@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" @click="copy">
+    <img alt="Vue logo" src="../assets/logo.png">
     <!-- <img src="http://pic26.nipic.com/20130121/9252150_101440518391_2.jpg" alt="">
     <img src="http://pic38.nipic.com/20140228/2457331_083845176000_2.jpg" alt="">
     <img src="http://pic16.nipic.com/20111006/6239936_092702973000_2.jpg" alt="">
@@ -28,29 +28,22 @@ export default {
     Loading
   },
   created() {
+    this.init(1)
+    this.init(2)
+    this.init(3)
   },
   mounted() {
     console.log("process", process.env);
   },
   methods: {
-    copy() {
-      let oInput = document.createElement('input')
-      oInput.value = '2131'
-      console.log('oInput', oInput.value)
-      document.body.appendChild(oInput)
-      oInput.select()
-      document.execCommand("Copy")
-      document.body.removeChild(oInput)            
-    },
-    init() {
+    init(num) {
       requestApi({
-        name: "new_info",
+        name: "test",
         data: {
-          gid: 97,
-          key: "aPCvnq"
-        }
+          token: "f7f04f8a4c954ad8b323aa3440e60e97",
+        },
       }).then(res => {
-        console.log("init()", res);
+        console.log("init()", res, num);
       });
     },
     ...mapMutations({

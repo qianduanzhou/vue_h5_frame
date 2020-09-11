@@ -13,7 +13,7 @@ import performance from '@/sdk/performance'
 export default {
   mounted() {
     //  性能监控
-    performance()
+    // performance()
   }
 }
 </script>
