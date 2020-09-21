@@ -147,7 +147,6 @@ function getWaitModelHooks(name) {
   let afterSuc = res => {
     // console.log('进入到after过程', window.singleton[name]);
     let func = null;
-    // eslint-disable-next-line
     while ((func = window.singleton[name].shift())) {
       func(res);
     }
