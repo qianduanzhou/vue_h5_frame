@@ -58,8 +58,7 @@ function Request(options, data, header, hooks = {}, headerType) {
       headers: {
         'Content-Type': headerType && headerType == 'json' ? 'application/json' : 'application/x-www-form-urlencoded',
         ...header
-      },
-      cancelToken: source.token
+      }
     }).then(
       function(res) {
         resolve(res);
@@ -179,7 +178,6 @@ function getBreakModelHooks(name) {
   };
   setTimeout(async () => {
     if (window.singleton[name].length <= 0) return
-    console.log('window.singleton', window.singleton)
     let item = window.singleton[name].pop()
     window.singleton[name] = []
     window.singleton[name + "lock"] = false;
