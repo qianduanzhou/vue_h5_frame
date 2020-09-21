@@ -1,10 +1,11 @@
-import request from "./axios";
+import {service as request, source} from "./axios";
 import qs from "qs";
 import apis from "./apis";
 
 const MODEL_NORMAL = "normal";
 const MODEL_WAIT = "wait";
 const MODEL_QUEUE = "queue";
+const MODEL_BREAK = "break";
 const MODEL_CANCEL = "cancel";
 
 function requestApi({ name, data, header, headerType }) {
@@ -21,8 +22,8 @@ function requestApi({ name, data, header, headerType }) {
   }
   return new Promise(async (resolve, reject) => {
     let next = true;
-    if (hooks.pre || hooks.last) {
-      next = hooks[hooks.pre ? 'pre' : 'last']({
+    if (hooks.pre) {
+      next = hooks[hooks.pre ? 'pre' : 'breakFunc']({
         resolve,
         reject,
         name,
@@ -33,7 +34,7 @@ function requestApi({ name, data, header, headerType }) {
         headerType
       });
     }
-    if (next && !hooks.last) {
+    if (next) {
       let res = await Request(options, data, header, hooks, headerType);
       resolve(res);
     }
@@ -57,7 +58,8 @@ function Request(options, data, header, hooks = {}, headerType) {
       headers: {
         'Content-Type': headerType && headerType == 'json' ? 'application/json' : 'application/x-www-form-urlencoded',
         ...header
-      }
+      },
+      cancelToken: source.token
     }).then(
       function(res) {
         resolve(res);
@@ -82,9 +84,9 @@ function getHooks(name, options) {
     case MODEL_QUEUE:
       // 队列模式
       return getQueueModelHooks(name);
-    case MODEL_CANCEL:
+    case MODEL_BREAK:
       // 中断模式
-      return getCancelModelHooks(name);
+      return getBreakModelHooks(name);
     default:
       return {};
   }
@@ -159,37 +161,25 @@ function getWaitModelHooks(name) {
 }
 
 // 中断模式：拿最后一个的结果
-function getCancelModelHooks(name) {
-  let last = ({ resolve, reject, name, hooks, options, data }) => {
+function getBreakModelHooks(name) {
+  let pre = ({ resolve, reject, name, hooks, options, data }) => {
     // console.log('进入到pre过程', name);
     if (!window.singleton) window.singleton = {};
-    window.singleton[name + "lock"] = window.singleton[name + "lock"] || false;
-    if (window.singleton[name + "lock"]) {
-      window.singleton[name].push({
-        resolve,
-        reject,
-        name,
-        hooks,
-        options,
-        data
-      });
-      return false;
-    } else {
-      window.singleton[name + "lock"] = true;
-      window.singleton[name] = [];
-      window.singleton[name].push({
-        resolve,
-        reject,
-        name,
-        hooks,
-        options,
-        data
-      });
-      return false;
-    }
+    window.singleton[name + "lock"] = window.singleton[name + "lock"] || true;
+    window.singleton[name] = window.singleton[name] || [];
+    window.singleton[name].push({
+      resolve,
+      reject,
+      name,
+      hooks,
+      options,
+      data
+    });
+    return false;
   };
   setTimeout(async () => {
     if (window.singleton[name].length <= 0) return
+    console.log('window.singleton', window.singleton)
     let item = window.singleton[name].pop()
     window.singleton[name] = []
     window.singleton[name + "lock"] = false;
@@ -200,7 +190,7 @@ function getCancelModelHooks(name) {
     }
   }, 0);
   return {
-    last
+    pre
   };
 }
 export { requestApi };

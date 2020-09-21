@@ -1,5 +1,7 @@
 import axios from 'axios'
-import store from '../store'
+const CancelToken = axios.CancelToken;
+const source = CancelToken.source();
+
 // 创建axios实例
 const service = axios.create({
   baseURL: process.env.NODE_ENV == 'development' ? '/api' : process.env.VUE_APP_BASE_API, // api 的 BASE_API
@@ -33,4 +35,4 @@ service.interceptors.response.use(
   }
 )
 
-export default service
+export {service, source} 
