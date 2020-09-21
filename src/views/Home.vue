@@ -23,22 +23,42 @@ export default {
     Loading
   },
   created() {
-    this.init(1)
-    this.init(2)
-    this.init(3)
+    this.init1()
+    this.init2()
+    this.init3()
   },
   mounted() {
     console.log("process", process.env);
   },
   methods: {
-    init(num) {
+    init1(num) {
       requestApi({
         name: "test",
         data: {
-          token: "f7f04f8a4c954ad8b323aa3440e60e97",
+          token: "1",
         },
       }).then(res => {
-        console.log("init()", res, num);
+        console.log("init1", res, 1);
+      });
+    },
+    init2(num) {
+      requestApi({
+        name: "test",
+        data: {
+          token: "2",
+        },
+      }).then(res => {
+        console.log("init2", res, 2);
+      });
+    },
+    init3(num) {
+      requestApi({
+        name: "test",
+        data: {
+          token: "3",
+        },
+      }).then(res => {
+        console.log("init3", res, 3);
       });
     },
     ...mapMutations({

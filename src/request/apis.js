@@ -4,6 +4,6 @@ export default {
     test: {
         url: '/singlePoetry',
         method: 'get',
-        model: ''
+        model: 'cancel'
     }
 }
