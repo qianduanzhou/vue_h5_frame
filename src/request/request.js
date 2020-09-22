@@ -1,12 +1,14 @@
-import request from "./axios";
+import {service as request, CancelToken} from "./axios";
 import qs from "qs";
 import apis from "./apis";
 
 const MODEL_NORMAL = "normal";
 const MODEL_WAIT = "wait";
 const MODEL_QUEUE = "queue";
-
-function requestApi({ name, data, header, headerType }) {
+const MODEL_BREAK = "break";
+let cancel = null
+function requestApi({ name, data, header, headerType, isCancel }) {
+  (cancel && isCancel) && cancel()
   if (Object.keys(apis).indexOf(name) === -1) {
     //action不在reqConfig配置中
     throw new SyntaxError(`请在apis文件注册路由:  ${name}`);
@@ -33,14 +35,14 @@ function requestApi({ name, data, header, headerType }) {
       });
     }
     if (next) {
-      let res = await Request(options, data, header, hooks, headerType);
+      let res = await Request(options, data, header, hooks, headerType, isCancel);
       resolve(res);
     }
   });
 }
 
 // 发起请求
-function Request(options, data, header, hooks = {}, headerType) {
+function Request(options, data, header, hooks = {}, headerType, isCancel) {
   return new Promise(function(resolve, reject) {
     request({
       url: options.url,
@@ -56,7 +58,8 @@ function Request(options, data, header, hooks = {}, headerType) {
       headers: {
         'Content-Type': headerType && headerType == 'json' ? 'application/json' : 'application/x-www-form-urlencoded',
         ...header
-      }
+      },
+      cancelToken: isCancel ? new CancelToken((c) => { cancel = c }) : null // new CancelToken((c) => {cancel = c;})  cancel()
     }).then(
       function(res) {
         resolve(res);
@@ -81,6 +84,9 @@ function getHooks(name, options) {
     case MODEL_QUEUE:
       // 队列模式
       return getQueueModelHooks(name);
+    case MODEL_BREAK:
+      // 中断模式
+      return getBreakModelHooks(name);
     default:
       return {};
   }
@@ -143,7 +149,6 @@ function getWaitModelHooks(name) {
   let afterSuc = res => {
     // console.log('进入到after过程', window.singleton[name]);
     let func = null;
-    // eslint-disable-next-line
     while ((func = window.singleton[name].shift())) {
       func(res);
     }
@@ -155,4 +160,36 @@ function getWaitModelHooks(name) {
   };
 }
 
+// 中断模式：拿最后一个的结果
+function getBreakModelHooks(name) {
+  let pre = ({ resolve, reject, name, hooks, options, data }) => {
+    // console.log('进入到pre过程', name);
+    if (!window.singleton) window.singleton = {};
+    window.singleton[name + "lock"] = window.singleton[name + "lock"] || true;
+    window.singleton[name] = window.singleton[name] || [];
+    window.singleton[name].push({
+      resolve,
+      reject,
+      name,
+      hooks,
+      options,
+      data
+    });
+    return false;
+  };
+  setTimeout(async () => {
+    if (window.singleton[name].length <= 0) return
+    let item = window.singleton[name].pop()
+    window.singleton[name] = []
+    window.singleton[name + "lock"] = false;
+    try {
+      item.resolve(await Request(item.options, item.data, item.header, {}));
+    } catch (e) {
+      item.reject(e);
+    }
+  }, 0);
+  return {
+    pre
+  };
+}
 export { requestApi };

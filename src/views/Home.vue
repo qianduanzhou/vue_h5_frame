@@ -1,6 +1,8 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
+    <img alt="Vue logo" src="../assets/logo.png"><br/>
+    <van-button type="primary" @click="init(1)">发起请求</van-button>
+    <!-- <van-button type="danger" @click="cancelFuc">取消请求</van-button> -->
     <Loading/>
   </div>
 </template>
@@ -23,9 +25,7 @@ export default {
     Loading
   },
   created() {
-    this.init(1)
-    this.init(2)
-    this.init(3)
+
   },
   mounted() {
     console.log("process", process.env);
@@ -35,10 +35,11 @@ export default {
       requestApi({
         name: "test",
         data: {
-          token: "f7f04f8a4c954ad8b323aa3440e60e97",
+          token: num,
         },
+        isCancel: true
       }).then(res => {
-        console.log("init()", res, num);
+        console.log("init——" + num, res);
       });
     },
     ...mapMutations({
