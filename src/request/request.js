@@ -1,4 +1,4 @@
-import {service as request, source} from "./axios";
+import {service as request, CancelToken} from "./axios";
 import qs from "qs";
 import apis from "./apis";
 
@@ -6,9 +6,8 @@ const MODEL_NORMAL = "normal";
 const MODEL_WAIT = "wait";
 const MODEL_QUEUE = "queue";
 const MODEL_BREAK = "break";
-const MODEL_CANCEL = "cancel";
 
-function requestApi({ name, data, header, headerType }) {
+function requestApi({ name, data, header, headerType, cancelToken }) {
   if (Object.keys(apis).indexOf(name) === -1) {
     //action不在reqConfig配置中
     throw new SyntaxError(`请在apis文件注册路由:  ${name}`);
@@ -23,7 +22,7 @@ function requestApi({ name, data, header, headerType }) {
   return new Promise(async (resolve, reject) => {
     let next = true;
     if (hooks.pre) {
-      next = hooks[hooks.pre ? 'pre' : 'breakFunc']({
+      next = hooks.pre({
         resolve,
         reject,
         name,
@@ -35,14 +34,14 @@ function requestApi({ name, data, header, headerType }) {
       });
     }
     if (next) {
-      let res = await Request(options, data, header, hooks, headerType);
+      let res = await Request(options, data, header, hooks, headerType, cancelToken);
       resolve(res);
     }
   });
 }
 
 // 发起请求
-function Request(options, data, header, hooks = {}, headerType) {
+function Request(options, data, header, hooks = {}, headerType, cancelToken) {
   return new Promise(function(resolve, reject) {
     request({
       url: options.url,
@@ -58,7 +57,8 @@ function Request(options, data, header, hooks = {}, headerType) {
       headers: {
         'Content-Type': headerType && headerType == 'json' ? 'application/json' : 'application/x-www-form-urlencoded',
         ...header
-      }
+      },
+      cancelToken // new CancelToken((c) => {cancel = c;})  cancel()
     }).then(
       function(res) {
         resolve(res);
@@ -191,4 +191,4 @@ function getBreakModelHooks(name) {
     pre
   };
 }
-export { requestApi };
+export { requestApi, CancelToken };

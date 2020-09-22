@@ -1,6 +1,5 @@
 import axios from 'axios'
 const CancelToken = axios.CancelToken;
-const source = CancelToken.source();
 
 // 创建axios实例
 const service = axios.create({
@@ -35,4 +34,4 @@ service.interceptors.response.use(
   }
 )
 
-export {service, source} 
+export {service, CancelToken} 
