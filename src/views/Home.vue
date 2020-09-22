@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { requestApi, CancelToken } from "@/request/request";
+import { requestApi } from "@/request/request";
 import { mapMutations } from "vuex";
 import Loading from "components/Loading";
 import wxconfig from '@/utils/wxconfig'
@@ -32,22 +32,15 @@ export default {
   },
   methods: {
     init(num) {
-      this.cancelFuc()
       requestApi({
         name: "test",
         data: {
           token: num,
         },
-        cancelToken: new CancelToken((c) => {
-          // 函数接收一个 cancel 函数作为参数
-          this.cancel = c;
-        })
+        isCancel: true
       }).then(res => {
         console.log("init——" + num, res);
       });
-    },
-    cancelFuc() {
-      this.cancel && this.cancel()
     },
     ...mapMutations({
       setLoading: "SET_LOADING"

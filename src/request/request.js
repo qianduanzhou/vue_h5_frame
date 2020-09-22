@@ -6,8 +6,9 @@ const MODEL_NORMAL = "normal";
 const MODEL_WAIT = "wait";
 const MODEL_QUEUE = "queue";
 const MODEL_BREAK = "break";
-
-function requestApi({ name, data, header, headerType, cancelToken }) {
+let cancel = null
+function requestApi({ name, data, header, headerType, isCancel }) {
+  (cancel && isCancel) && cancel()
   if (Object.keys(apis).indexOf(name) === -1) {
     //action不在reqConfig配置中
     throw new SyntaxError(`请在apis文件注册路由:  ${name}`);
@@ -34,14 +35,14 @@ function requestApi({ name, data, header, headerType, cancelToken }) {
       });
     }
     if (next) {
-      let res = await Request(options, data, header, hooks, headerType, cancelToken);
+      let res = await Request(options, data, header, hooks, headerType, isCancel);
       resolve(res);
     }
   });
 }
 
 // 发起请求
-function Request(options, data, header, hooks = {}, headerType, cancelToken) {
+function Request(options, data, header, hooks = {}, headerType, isCancel) {
   return new Promise(function(resolve, reject) {
     request({
       url: options.url,
@@ -58,7 +59,7 @@ function Request(options, data, header, hooks = {}, headerType, cancelToken) {
         'Content-Type': headerType && headerType == 'json' ? 'application/json' : 'application/x-www-form-urlencoded',
         ...header
       },
-      cancelToken // new CancelToken((c) => {cancel = c;})  cancel()
+      cancelToken: isCancel ? new CancelToken((c) => { cancel = c }) : null // new CancelToken((c) => {cancel = c;})  cancel()
     }).then(
       function(res) {
         resolve(res);
@@ -191,4 +192,4 @@ function getBreakModelHooks(name) {
     pre
   };
 }
-export { requestApi, CancelToken };
+export { requestApi };
