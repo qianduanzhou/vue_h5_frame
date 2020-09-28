@@ -8,9 +8,10 @@ import VConsole from "vconsole";
 import "./common/css/normalize.css";
 
 import { Button, Loading } from "vant";
+import Test from './plugins/test'
 Vue.use(Button);
 Vue.use(Loading);
-
+Vue.use(new Test(1))
 /**
  * 注册数据上报到vue实例上
  */

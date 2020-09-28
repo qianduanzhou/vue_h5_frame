@@ -31,6 +31,7 @@
     "ali-oss": "^6.2.1",
     "babel-eslint": "^10.0.1",
     "babel-plugin-import": "^1.12.2",
+    "babel-plugin-transform-class-properties": "^6.24.1",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
     "less": "^3.0.4",
