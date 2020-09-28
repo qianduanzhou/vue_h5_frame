@@ -1,7 +1,7 @@
 import {service as request, CancelToken} from "./axios";
 import qs from "qs";
-import apis from "./apis";
-
+import api from "./api";
+const apiList = api.getApiList()
 const MODEL_NORMAL = "normal";
 const MODEL_WAIT = "wait";
 const MODEL_QUEUE = "queue";
@@ -9,11 +9,11 @@ const MODEL_BREAK = "break";
 let cancel = null
 function requestApi({ name, data, header, headerType, isCancel }) {
   (cancel && isCancel) && cancel()
-  if (Object.keys(apis).indexOf(name) === -1) {
+  if (Object.keys(apiList).indexOf(name) === -1) {
     //action不在reqConfig配置中
-    throw new SyntaxError(`请在apis文件注册路由:  ${name}`);
+    throw new SyntaxError(`请在apiList文件注册路由:  ${name}`);
   }
-  const options = apis[name];
+  const options = apiList[name];
   options.method = options.method || "get";
   getHooks(name, options);
   let hooks = {};
