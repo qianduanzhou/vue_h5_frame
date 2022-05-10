@@ -1,5 +1,5 @@
 //  设计稿设备宽度
-const DEVICEWIDTH = 375;
+const DEVICEWIDTH = 1920;
 //  设计稿设备宽度下对应比例
 const RATIO = DEVICEWIDTH / 100;
 // 设置 rem 函数
