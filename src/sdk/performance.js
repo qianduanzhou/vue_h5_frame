@@ -56,17 +56,17 @@ const performance = function() {
       console.log('首屏时间', firstscreen_time, firstscreenTime)
       setTimeout(() => {
         console.log('performance', performance, performance.timing.domInteractive)
-        sendkv({
-          key: 90075,
-          dns_time: t.domainLookupEnd - t.domainLookupStart,
-          tcp_time: t.connectEnd - t.connectStart,
-          firstpacket_time: t.responseStart - t.navigationStart,
-          request_time: t.responseEnd - t.requestStart,
-          white_time: t.domLoading - t.navigationStart,
-          firstscreen_time: firstscreen_time,
-          dom_time: t.domComplete - t.domLoading,
-          loadPage_time: t.loadEventEnd - t.navigationStart
-        })
+        // sendkv({
+        //   key: 90075,
+        //   dns_time: t.domainLookupEnd - t.domainLookupStart,
+        //   tcp_time: t.connectEnd - t.connectStart,
+        //   firstpacket_time: t.responseStart - t.navigationStart,
+        //   request_time: t.responseEnd - t.requestStart,
+        //   white_time: t.domLoading - t.navigationStart,
+        //   firstscreen_time: firstscreen_time,
+        //   dom_time: t.domComplete - t.domLoading,
+        //   loadPage_time: t.loadEventEnd - t.navigationStart
+        // })
        }, 0)
     }
   });

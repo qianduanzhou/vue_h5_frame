@@ -108,6 +108,7 @@ module.exports = {
     global: true,
     window: true,
     document: true,
-    wx: true
+    wx: true,
+    __webpack_public_path__: true
   }
 };
