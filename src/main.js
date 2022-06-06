@@ -24,10 +24,10 @@ Vue.config.errorHandler = function (err, vm, info) {
   console.log('info', info)
 }
 
-//  调试
-if (process.env.VUE_APP_BASE_ENV === 'dev') {
-  let vconsole = new VConsole()
-}
+// //  调试
+// if (process.env.VUE_APP_BASE_ENV === 'dev') {
+//   let vconsole = new VConsole()
+// }
 
 
 Vue.config.productionTip = false;
